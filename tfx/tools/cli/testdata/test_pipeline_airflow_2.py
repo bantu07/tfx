@@ -21,7 +21,6 @@ from __future__ import print_function
 import datetime
 import os
 from tfx.components.example_gen.csv_example_gen.component import CsvExampleGen
-from tfx.components.example_validator.component import ExampleValidator
 from tfx.components.schema_gen.component import SchemaGen
 from tfx.components.statistics_gen.component import StatisticsGen
 from tfx.orchestration import pipeline
@@ -62,16 +61,11 @@ def _create_pipeline():
   # Generates schema based on statistics files.
   infer_schema = SchemaGen(statistics=statistics_gen.outputs['statistics'])
 
-  # Performs anomaly detection based on statistics and data schema.
-  validate_stats = ExampleValidator(
-      statistics=statistics_gen.outputs['statistics'],
-      schema=infer_schema.outputs['schema'])
-
   return pipeline.Pipeline(
       pipeline_name='chicago_taxi_simple',
       pipeline_root=_pipeline_root,
       components=[
-          example_gen, statistics_gen, infer_schema, validate_stats
+          example_gen, statistics_gen, infer_schema
       ],
       enable_cache=True,
       metadata_db_root=_metadata_db_root,
